@@ -42,6 +42,7 @@ def display_chat_page(pipe):
         st.subheader("回答:")
         st.markdown(st.session_state.current_answer) # Markdownで表示
         st.info(f"応答時間: {st.session_state.response_time:.2f}秒")
+        st.info(f"単語数: {len(st.session_state.current_answer.split())}語")
 
         # フィードバックフォームを表示 (まだフィードバックされていない場合)
         if not st.session_state.feedback_given:
