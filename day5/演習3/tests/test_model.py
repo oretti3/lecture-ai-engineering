@@ -135,7 +135,10 @@ def test_model_accuracy_reproducibility_with_seed_variation(sample_data, preproc
         model = Pipeline(
             steps=[
                 ("preprocessor", preprocessor),
-                ("classifier", RandomForestClassifier(n_estimators=100, random_state=seed)),
+                (
+                    "classifier",
+                    RandomForestClassifier(n_estimators=100, random_state=seed),
+                ),
             ]
         )
         model.fit(X_train, y_train)
@@ -146,7 +149,9 @@ def test_model_accuracy_reproducibility_with_seed_variation(sample_data, preproc
     # ばらつきが大きすぎないことを確認（例：標準偏差 < 0.02）
     std_dev = np.std(accuracies)
     print(f"std_dev: {std_dev}")
-    assert std_dev < 0.02, f"シードを変えたときの精度のばらつきが大きすぎます: std={std_dev}"
+    assert (
+        std_dev < 0.02
+    ), f"シードを変えたときの精度のばらつきが大きすぎます: std={std_dev}"
 
 
 def test_model_inference_time(train_model):
