@@ -121,6 +121,39 @@ def test_model_accuracy(train_model):
     assert accuracy >= 0.75, f"モデルの精度が低すぎます: {accuracy}"
 
 
+def test_model_accuracy_reproducibility_with_seed_variation(sample_data, preprocessor):
+    """ランダムシードを変えた場合のモデル精度のばらつきを確認"""
+    # データの分割
+    X = sample_data.drop("Survived", axis=1)
+    y = sample_data["Survived"].astype(int)
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+
+    accuracies = []
+    for seed in range(10):
+        model = Pipeline(
+            steps=[
+                ("preprocessor", preprocessor),
+                (
+                    "classifier",
+                    RandomForestClassifier(n_estimators=100, random_state=seed),
+                ),
+            ]
+        )
+        model.fit(X_train, y_train)
+        acc = accuracy_score(y_test, model.predict(X_test))
+        accuracies.append(acc)
+        print(f"seed={seed} → accuracy: {acc}")
+
+    # ばらつきが大きすぎないことを確認（例：標準偏差 < 0.02）
+    std_dev = np.std(accuracies)
+    print(f"std_dev: {std_dev}")
+    assert (
+        std_dev < 0.02
+    ), f"シードを変えたときの精度のばらつきが大きすぎます: std={std_dev}"
+
+
 def test_model_inference_time(train_model):
     """モデルの推論時間を検証"""
     model, X_test, _ = train_model
